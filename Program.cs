@@ -5,8 +5,14 @@ using PartnerProjectDeShawn.api.DTO;
 List<Dog> dogs = new List<Dog>
 {
     new Dog {Id=1,Name="Bob", CityId=1},
-    new Dog {Id=2,Name="Wade", CityId=2},
-    new Dog {Id=3,Name="Mark", CityId=3}
+    new Dog {Id=2,Name="Wade", CityId=2, WalkerId = 2},
+    new Dog {Id=3,Name="Mark", CityId=3, WalkerId = 1}
+};
+
+List<Walker> walkers = new List<Walker>
+{
+    new Walker {Id = 1, Name = "Ethan"},
+    new Walker {Id = 2, Name = "Tyler"}
 };
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,11 +40,36 @@ app.MapGet("/api/hello", () =>
 
 app.MapGet("/api/dogs", () =>
 {
-    return dogs.Select(d=> new DogDto
+    return dogs.Select(d => new DogDto
     {
-        Id=d.Id,
-        Name=d.Name,
-        CityId=d.CityId
+        Id = d.Id,
+        Name = d.Name,
+        CityId = d.CityId
+    });
+});
+
+app.MapGet("/api/dogs/{id}", (int id) =>
+{
+    Dog dog = dogs.FirstOrDefault(d => d.Id == id);
+    if (dog == null)
+    {
+        return Results.NotFound();
+    }
+
+
+
+    return Results.Ok(new DogDto
+    {
+        Id = dog.Id,
+        Name = dog.Name,
+        CityId = dog.CityId,
+        WalkerId = dog.WalkerId,
+        Walker = walkers.Where(w => w.Id == dog.WalkerId)
+            .Select(w => new WalkerDto
+            {
+                Id = w.Id,
+                Name = w.Name
+            }).First()
     });
 });
 

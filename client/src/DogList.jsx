@@ -17,7 +17,7 @@ export const DogList = () => {
           {allDogs.map((dog) => {
             return (
               <div className="dog" key={dog.id}>
-                <Link>{dog.name}</Link>
+                <Link to={`/dogProfile/${dog.id}`}>{dog.name}</Link>
               </div>
             )
           })}
