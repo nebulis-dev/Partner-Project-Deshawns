@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using PartnerProjectDeShawn.api;
 using PartnerProjectDeShawn.api.DTO;
 
@@ -21,6 +22,14 @@ List<City> cities = new List<City>
     new City {Id=1, Name="Nashville"},
     new City {Id =2, Name="Chicago"},
     new City {Id =3, Name="Los Angeles"}
+};
+
+List<CityWalker> cityWalkers = new List<CityWalker>
+{
+    new CityWalker { Id = 1, CityId = 1, WalkerId = 1},
+    new CityWalker { Id = 2, CityId = 2, WalkerId = 1},
+    new CityWalker { Id = 3, CityId = 3, WalkerId = 2},
+    new CityWalker { Id = 4, CityId = 1, WalkerId = 2}
 };
 
 
@@ -47,6 +56,7 @@ app.MapGet("/api/hello", () =>
     return new { Message = "Welcome to DeShawn's Dog Walking" };
 });
 
+//dogs
 app.MapGet("/api/dogs", () =>
 {
     return dogs.Select(d => new DogDto
@@ -71,7 +81,7 @@ app.MapGet("/api/dogs/{id}", (int id) =>
         Name = dog.Name,
         CityId = dog.CityId,
         WalkerId = dog.WalkerId,
-        Walker = dog.WalkerId == null? null : walkers.Where(w => w.Id == dog.WalkerId)
+        Walker = dog.WalkerId == null ? null : walkers.Where(w => w.Id == dog.WalkerId)
             .Select(w => new WalkerDto
             {
                 Id = w.Id,
@@ -93,13 +103,49 @@ app.MapPost("/api/dog/", (Dog dog) =>
     });
 });
 
-
+//cities
 app.MapGet("/api/cities/", () =>
 {
-    return cities.Select(c=> new CityDto
+    return cities.Select(c => new CityDto
     {
-        Id=c.Id,
-        Name=c.Name
+        Id = c.Id,
+        Name = c.Name
+    });
+});
+
+app.MapGet("/api/cities/{id}", (int id) =>
+{
+    City city = cities.FirstOrDefault(c => c.Id == id);
+    if (city == null)
+    {
+        return Results.NotFound();
+    }
+
+    List<Walker> CityWalkers = cityWalkers
+        .Where(cw => cw.CityId == id)
+        .Select(cw => walkers.First(w => w.Id == cw.WalkerId))
+        .ToList();
+
+    return Results.Ok(new CityDto
+    {
+        Id = city.Id,
+        Name = city.Name,
+        Walkers = CityWalkers.Select(w => new WalkerDto
+        {
+            Id = w.Id,
+            Name = w.Name
+        }).ToList(),
+    }
+    );
+});
+
+//walkers
+app.MapGet("/api/walkers/", () =>
+{
+    return walkers.Select(w => new WalkerDto
+    {
+        Id = w.Id,
+        Name = w.Name
     });
 });
 
