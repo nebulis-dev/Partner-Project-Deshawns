@@ -38,3 +38,8 @@ export const getAllCities = async ()=>{
   const res = await fetch("/api/cities")
   return res.json()
 }
+
+export const getCity = async (id) => {
+  const res = await fetch(`/api/cities/${id}`)
+  return res.json()
+}

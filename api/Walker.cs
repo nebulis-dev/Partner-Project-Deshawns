@@ -6,4 +6,5 @@ public class Walker
     public string Name { get; set; }
 
     public List<Dog> Dogs { get; set; }
+    public List<City> Cities { get; set; }
 }
