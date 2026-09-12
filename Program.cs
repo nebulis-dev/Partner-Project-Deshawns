@@ -15,6 +15,15 @@ List<Walker> walkers = new List<Walker>
     new Walker {Id = 2, Name = "Tyler"}
 };
 
+
+List<City> cities = new List<City>
+{
+    new City {Id=1, Name="Nashville"},
+    new City {Id =2, Name="Chicago"},
+    new City {Id =3, Name="Los Angeles"}
+};
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -56,20 +65,41 @@ app.MapGet("/api/dogs/{id}", (int id) =>
         return Results.NotFound();
     }
 
-
-
     return Results.Ok(new DogDto
     {
         Id = dog.Id,
         Name = dog.Name,
         CityId = dog.CityId,
         WalkerId = dog.WalkerId,
-        Walker = walkers.Where(w => w.Id == dog.WalkerId)
+        Walker = dog.WalkerId == null? null : walkers.Where(w => w.Id == dog.WalkerId)
             .Select(w => new WalkerDto
             {
                 Id = w.Id,
                 Name = w.Name
             }).First()
+    });
+});
+
+app.MapPost("/api/dog/", (Dog dog) =>
+{
+    dog.Id = dogs.Max(d => d.Id) + 1;
+    dogs.Add(dog);
+
+    return Results.Created($"/api/dogs/{dog.Id}", new DogDto
+    {
+        Id = dog.Id,
+        Name = dog.Name,
+        CityId = dog.CityId,
+    });
+});
+
+
+app.MapGet("/api/cities/", () =>
+{
+    return cities.Select(c=> new CityDto
+    {
+        Id=c.Id,
+        Name=c.Name
     });
 });
 
