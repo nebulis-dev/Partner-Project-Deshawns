@@ -1,3 +1,5 @@
+import { json } from "react-router-dom"
+
 export const getGreeting = async () => {
   const res = await fetch("/api/hello")
   return res.json()
@@ -14,8 +16,25 @@ export const getDog = async (id) => {
   return res.json()
 }
 
+export const createNewDog = async (dog) =>{
+  return fetch("/api/dog",{
+    method:"POST",
+    headers:{
+      "content-type":"application/json"
+    },
+    body: JSON.stringify(dog)
+  }).then(res=>res.json())
+}
+
 //Walkers
 export const getWalkers = async () => {
   const res = await fetch("/api/walkers")
+  return res.json()
+}
+
+
+//City
+export const getAllCities = async ()=>{
+  const res = await fetch("/api/cities")
   return res.json()
 }
